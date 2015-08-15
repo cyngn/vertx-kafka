@@ -27,37 +27,35 @@ Listening for messages coming from a kafka broker.
 ### Configuration
 
 ```json
-	{
-    "consumer" :
-		{
-			"zookeeper.host" : "<zookeeperHost>",
-			"port": "<zookeeperPort>",
-			"workers.per.topic" : <totalWorkersToCreateForEachTopic>,
-			"group.id" : "<kafkaConsumerGroupId>",
-			"backoff.increment.ms" : "<backTimeInMilli>",
-			"autooffset.reset" : "<kafkaAutoOffset>",
-			"topics" : ["<topic1>", "<topic2>"],
-			"eventbus.address" : "<default kafka.message>"
-		}
-	}
+{
+  "consumer" : {
+    "zookeeper.host" : "<zookeeperHost>",
+    "port": "<zookeeperPort>",
+    "workers.per.topic" : <totalWorkersToCreateForEachTopic>,
+    "group.id" : "<kafkaConsumerGroupId>",
+    "backoff.increment.ms" : "<backTimeInMilli>",
+    "autooffset.reset" : "<kafkaAutoOffset>",
+    "topics" : ["<topic1>", "<topic2>"],
+    "eventbus.address" : "<default kafka.message>"
+  }
+}
 ```
 
 For example:
 
 ```json
-	{
-    "consumer" :
-		{
-			"zookeeper.host" : "localhost",
-			"port": "2181",
-			"workers.per.topic" : 3,
-			"group.id" : "testGroup",
-			"backoff.increment.ms" : "100",
-			"autooffset.reset" : "smallest",
-			"topics" : ["testTopic"],
-			"eventbus.address" : "kafka.to.vertx.bridge"
-		}
-	}
+{
+  "consumer" : {
+    "zookeeper.host" : "localhost",
+    "port": "2181",
+    "workers.per.topic" : 3,
+    "group.id" : "testGroup",
+    "backoff.increment.ms" : "100",
+    "autooffset.reset" : "smallest",
+    "topics" : ["testTopic"],
+    "eventbus.address" : "kafka.to.vertx.bridge"
+  }
+}
 ```
 Field breakdown:
 
@@ -126,25 +124,25 @@ Send a message to a kafka cluster on a predefined topic.
 ### Configuration
 
 ```json
-	{
-		"producer" : {
-			"serializer.class": "<serializerclass>",
-			"metadata.broker.list": "<host>:<name>",
-			"producer.type" : "async"
-		}
-	}
+{
+  "producer" : {
+    "serializer.class": "<serializerclass>",
+    "metadata.broker.list": "<host>:<name>",
+    "producer.type" : "async"
+  }
+}
 ```
 
 For example:
 
 ```json
-	{
-		"producer" : {
-			"serializer.class": "kafka.serializer.StringEncoder",
-			"metadata.broker.list": "localhost:9092",
-			"producer.type" : "async"
-		 }
-	}
+{
+  "producer" : {
+    "serializer.class": "kafka.serializer.StringEncoder",
+    "metadata.broker.list": "localhost:9092",
+    "producer.type" : "async"
+  }
+}
 ```
 
 * `serializer.class` The serializer class for messages
@@ -176,16 +174,15 @@ deployKafka(config);
 public void deployKafka(JsonObject config) {
    // use your vert.x reference to deploy the consumer verticle
 	 vertx.deployVerticle(MessageProducer.class.getName(),
-      new DeploymentOptions().setConfig(config),
-			deploy -> {
-   		      if(deploy.failed()) {
-        	      System.err.println(String.format("Failed to start kafka producer verticle, ex: %s", deploy.cause()));
-                vertx.close()
-                return;
-            }
-            System.out.println("kafka producer verticle started");
-      }
-	);
+     new DeploymentOptions().setConfig(config),
+		 deploy -> {
+   	   if(deploy.failed()) {
+         System.err.println(String.format("Failed to start kafka producer verticle, ex: %s", deploy.cause()));
+          vertx.close()
+          return;
+       }
+       System.out.println("kafka producer verticle started");
+   });
 }
 ```
 #### Send message to kafka topic
