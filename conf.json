@@ -1,0 +1,19 @@
+// Global list of all configuration property at https://kafka.apache.org/08/configuration.html
+{
+  "consumer" : {
+    "zookeeper.host": "localhost",
+    "port": "2181",
+    "workers.per.topic": 3,
+    "group.id": "testGroup",
+    "backoff.increment.ms": "100",
+    "autooffset.reset": "smallest",
+    "topics": [
+      "testTopic"
+    ]
+  },
+  "producer" : {
+    "serializer.class": "kafka.serializer.StringEncoder",
+    "metadata.broker.list": "localhost:9092",
+    "producer.type" : "async"
+  }
+}

@@ -1,0 +1,5 @@
+[gerrit]
+host=review.cyanogenmod.org
+port=29418
+project=cyngn/vertx-kafka
+defaultbranch=master
