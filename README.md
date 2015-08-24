@@ -29,7 +29,7 @@ Listening for messages coming from a kafka broker.
 ```json
 {
   "consumer" : {
-    "zookeeper.host" : "<zookeeperHost>",
+    "zookeeper.connect" : "<zookeeperConnectionString>",
     "port": "<zookeeperPort>",
     "workers.per.topic" : <totalWorkersToCreateForEachTopic>,
     "group.id" : "<kafkaConsumerGroupId>",
@@ -59,8 +59,7 @@ For example:
 ```
 Field breakdown:
 
-* `zookeeper.host` a zookeeper host being used with your kafka clusters
-* `port` zookeeper port to connect on
+* `zookeeper.connect` a zookeeper connection string of form hostname1:port1,hostname2:port2,hostname3:port3/chroot/path used with your kafka clusters
 * `workers.per.topic` a thread will be spawned to consume messages up to the total number specified for each topic
 * `group.id` the kafka consumer group name that will be consuming related to
 * `backoff.increment.ms` backoff interval for contacting broker without messages in milliseconds
