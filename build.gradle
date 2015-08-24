@@ -2,7 +2,7 @@ apply plugin: 'java'
 // Uncomment below when doing official builds
 //apply from: "gradle/sona.gradle"
 
-version = '0.1.0'
+version = '0.3.0'
 group = "com.cyngn.vertx"
 archivesBaseName = "vertx-kafka"
 
@@ -27,9 +27,12 @@ repositories {
 
 dependencies {
   compile 'io.vertx:vertx-core:3.0.0'
-  compile ("org.apache.kafka:kafka_2.10:0.8.2.1") {
+  compile 'org.slf4j:log4j-over-slf4j:1.7.12'
+  compile ("org.apache.kafka:kafka_2.10:0.8.2.2") {
       exclude group: 'com.sun.jdmk', module: 'jmxtools'
       exclude group: 'com.sun.jmx', module: 'jmxri'
+      exclude group: 'org.slf4j', module: 'slf4j-log4j12'
+      exclude group: 'log4j', module: 'log4j'
   }
   testCompile "junit:junit:4.11"
   testCompile "io.vertx:vertx-unit:3.0.0"

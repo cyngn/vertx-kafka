@@ -89,9 +89,7 @@ public class MessageConsumer extends AbstractVerticle {
 
     private Properties populateKafkaConfig(JsonObject config) {
         Properties consumerConfig = new Properties();
-        consumerConfig.put(ConfigConstants.ZK_CONNECT, String.format("%s:%s",
-                config.getString(ConfigConstants.ZK_HOST, "localhost"),
-                config.getString(ConfigConstants.ZK_PORT, "2181")));
+        consumerConfig.put(ConfigConstants.ZK_CONNECT, config.getString(ConfigConstants.ZK_CONNECT, "localhost:2181"));
         consumerConfig.put(ConfigConstants.BACKOFF_INCREMENT_MS,
                 config.getString(ConfigConstants.BACKOFF_INCREMENT_MS, "100"));
         consumerConfig.put(ConfigConstants.BACKOFF_INCREMENT_MS,
