@@ -20,8 +20,6 @@ package com.cyngn.kafka.config;
  * @author truelove@cyngn.com (Jeremy Truelove) 1/27/15
  */
 public class ConfigConstants {
-    public static String ZK_HOST = "zookeeper.host";
-    public static String ZK_PORT = "zookeeper.port";
     public static String TOPICS = "topics";
     public static String WORKERS_PER_TOPIC = "workers.per.topic";
     public static String GROUP_ID = "group.id";
