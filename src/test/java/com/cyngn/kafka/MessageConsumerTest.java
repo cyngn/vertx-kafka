@@ -2,17 +2,15 @@ package com.cyngn.kafka;
 
 import com.cyngn.kafka.config.ConfigConstants;
 import io.vertx.core.DeploymentOptions;
-import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
-import io.vertx.core.eventbus.Message;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
-import org.junit.*;
+import org.junit.Ignore;
+import org.junit.Test;
 import org.junit.runner.RunWith;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,32 +61,32 @@ public class MessageConsumerTest {
 
 
         vertx.deployVerticle(MessageConsumer.class.getName(),
-                new DeploymentOptions().setConfig(config), deploy -> {
-                    if (deploy.failed()) {
-                        logger.error("", deploy.cause());
-                        testContext.fail("Could not deploy verticle");
+            new DeploymentOptions().setConfig(config), deploy -> {
+                if (deploy.failed()) {
+                    logger.error("", deploy.cause());
+                    testContext.fail("Could not deploy verticle");
+                    async.complete();
+                    vertx.close();
+                } else {
+                    long timerId = vertx.setTimer(20000, theTimerId ->
+                    {
+                        logger.info("Failed to get any messages");
+                        testContext.fail("Test did not complete in 20 seconds");
                         async.complete();
                         vertx.close();
-                    } else {
-                        long timerId = vertx.setTimer(20000, theTimerId ->
-                        {
-                            logger.info("Failed to get any messages");
-                            testContext.fail("Test did not complete in 20 seconds");
-                            async.complete();
-                            vertx.close();
-                        });
+                    });
 
-                        logger.info("Registering listener on event bus for kafka messages");
+                    logger.info("Registering listener on event bus for kafka messages");
 
-                        vertx.eventBus().consumer(MessageConsumer.EVENTBUS_DEFAULT_ADDRESS, message -> {
-                            assertTrue(message.body().toString().length() > 0);
-                            logger.info("got message: " + message.body());
-                            vertx.cancelTimer(timerId);
-                            async.complete();
-                            vertx.close();
-                        });
-                    }
+                    vertx.eventBus().consumer(MessageConsumer.EVENTBUS_DEFAULT_ADDRESS, message -> {
+                        assertTrue(message.body().toString().length() > 0);
+                        logger.info("got message: " + message.body());
+                        vertx.cancelTimer(timerId);
+                        async.complete();
+                        vertx.close();
+                    });
                 }
+            }
         );
     }
 }
