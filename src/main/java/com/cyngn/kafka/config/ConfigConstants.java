@@ -30,8 +30,9 @@ public class ConfigConstants {
 
 
     // producer constants
-    public static String METADATA_BROKER_LIST = "metadata.broker.list";
+    public static String BOOTSTRAP_SERVERS = "bootstrap.servers";
     public static String SERIALIZER_CLASS = "serializer.class";
-    public static String PRODUCER_TYPE = "producer.type";
-    public static String TOPIC = "topic";
+    public static String KEY_SERIALIZER_CLASS = "key.serializer";
+    public static String VALUE_SERIALIZER_CLASS = "value.serializer";
+    public static String DEFAULT_TOPIC = "default.topic";
 }
