@@ -1,5 +1,8 @@
 package com.cyngn.kafka;
 
+import com.cyngn.kafka.config.ConfigConstants;
+import com.cyngn.kafka.produce.KafkaPublisher;
+import com.cyngn.kafka.produce.MessageProducer;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
@@ -44,11 +47,13 @@ public class MessageProducerTest {
         vertx = Vertx.vertx();
 
         JsonObject producerConfig = new JsonObject();
-        producerConfig.put("metadata.broker.list", "localhost:9092");
-        producerConfig.put("serializer.class", "kafka.serializer.StringEncoder");
-        producerConfig.put("topic", "testTopic");
+        producerConfig.put(ConfigConstants.BOOTSTRAP_SERVERS, "localhost:9092");
+        producerConfig.put("serializer.class", "org.apache.kafka.common.serialization.StringSerializer");
+        producerConfig.put("default.topic", "testTopic");
 
         JsonObject config = new JsonObject().put("producer", producerConfig);
+
+        KafkaPublisher publisher = new KafkaPublisher(vertx.eventBus());
 
         vertx.deployVerticle(MessageProducer.class.getName(),
         new DeploymentOptions().setConfig(config), deploy -> {
@@ -58,10 +63,13 @@ public class MessageProducerTest {
                 async.complete();
                 vertx.close();
             } else {
-                vertx.eventBus().send(MessageProducer.EVENTBUS_DEFAULT_ADDRESS, new String("This is the message you should see in your consumer"));
+                publisher.send("This is the message you should see in your consumer");
+                // give vert.x some time to get the message off
+                vertx.setTimer(1000, timerId -> {
+                    async.complete();
+                    vertx.close();
+                });
             }
-            async.complete();
-            vertx.close();
         });
     }
 }
