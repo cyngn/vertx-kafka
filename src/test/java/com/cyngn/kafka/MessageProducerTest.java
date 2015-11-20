@@ -1,5 +1,8 @@
 package com.cyngn.kafka;
 
+import com.cyngn.kafka.config.ConfigConstants;
+import com.cyngn.kafka.produce.KafkaPublisher;
+import com.cyngn.kafka.produce.MessageProducer;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
@@ -44,24 +47,35 @@ public class MessageProducerTest {
         vertx = Vertx.vertx();
 
         JsonObject producerConfig = new JsonObject();
-        producerConfig.put("metadata.broker.list", "localhost:9092");
-        producerConfig.put("serializer.class", "kafka.serializer.StringEncoder");
-        producerConfig.put("topic", "testTopic");
+        producerConfig.put(ConfigConstants.BOOTSTRAP_SERVERS, "localhost:9092");
+        producerConfig.put(ConfigConstants.DEFAULT_SERIALIZER_CLASS, "org.apache.kafka.common.serialization.StringSerializer");
+        producerConfig.put(ConfigConstants.MAX_BLOCK_MS, new Long(500));
+        producerConfig.put("default.topic", "testGroup");
 
-        JsonObject config = new JsonObject().put("producer", producerConfig);
+        KafkaPublisher publisher = new KafkaPublisher(vertx.eventBus());
 
         vertx.deployVerticle(MessageProducer.class.getName(),
-        new DeploymentOptions().setConfig(config), deploy -> {
+        new DeploymentOptions().setConfig(producerConfig), deploy -> {
             if (deploy.failed()) {
                 logger.error("", deploy.cause());
                 testContext.fail("Could not deploy verticle");
                 async.complete();
                 vertx.close();
             } else {
-                vertx.eventBus().send(MessageProducer.EVENTBUS_DEFAULT_ADDRESS, new String("This is the message you should see in your consumer"));
+                publisher.send("This is the message you should see in your consumer");
+                // give vert.x some time to get the message off
+                long timerId = vertx.setTimer(10000, timer -> {
+                    async.complete();
+                    vertx.close();
+                });
+
+                vertx.eventBus().consumer(ConfigConstants.PRODUCER_ERROR_TOPIC, reply -> {
+                    testContext.fail("test has failed");
+                    logger.error("error: " + reply.toString());
+                    vertx.cancelTimer(timerId);
+                    vertx.close();
+                });
             }
-            async.complete();
-            vertx.close();
         });
     }
 }
