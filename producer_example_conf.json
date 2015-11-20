@@ -1,0 +1,5 @@
+// Global list of all configuration property at http://kafka.apache.org/documentation.html
+{
+    "serializer.class": "org.apache.kafka.common.serialization.StringSerializer",
+    "metadata.broker.list": "localhost:9092"
+}

@@ -2,7 +2,7 @@ apply plugin: 'java'
 // Uncomment below when doing official builds
 //apply from: "gradle/sona.gradle"
 
-version = '0.3.0'
+version = '0.4.0'
 group = "com.cyngn.vertx"
 archivesBaseName = "vertx-kafka"
 
@@ -21,27 +21,29 @@ if (!JavaVersion.current().java8Compatible) {
 }
 
 repositories {
+    maven { url = 'https://maven.cyngn.com/artifactory/repo' }
     mavenCentral()
     maven { url = 'http://oss.sonatype.org/content/repositories/snapshots/' }
 }
 
 dependencies {
-  compile 'io.vertx:vertx-core:3.0.0'
+  compile 'io.vertx:vertx-core:3.1.0'
   compile 'org.slf4j:log4j-over-slf4j:1.7.12'
-  compile ("org.apache.kafka:kafka_2.10:0.8.2.2") {
+  compile ("org.apache.kafka:kafka-clients:0.9.0.0") {
       exclude group: 'com.sun.jdmk', module: 'jmxtools'
       exclude group: 'com.sun.jmx', module: 'jmxri'
       exclude group: 'org.slf4j', module: 'slf4j-log4j12'
       exclude group: 'log4j', module: 'log4j'
   }
+  compile "io.vertx:vertx-codegen:3.1.0"
   testCompile "junit:junit:4.11"
-  testCompile "io.vertx:vertx-unit:3.0.0"
+  testCompile "io.vertx:vertx-unit:3.1.0"
   testCompile "org.mockito:mockito-core:1.9.5"
   testCompile "org.powermock:powermock-api-mockito:1.5.5"
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '2.0'
+  gradleVersion = '2.9'
 }
 
 task release() << {}

@@ -16,7 +16,7 @@ Add a dependency to vertx-kafka:
 <dependency>
     <groupId>com.cyngn.vertx</groupId>
     <artifactId>vertx-kafka</artifactId>
-    <version>0.3.0</version>
+    <version>0.4.0</version>
 </dependency>
 ```
 
@@ -28,16 +28,14 @@ Listening for messages coming from a kafka broker.
 
 ```json
 {
-  "consumer" : {
-    "zookeeper.connect" : "<zookeeperConnectionString>",
-    "port": "<zookeeperPort>",
-    "workers.per.topic" : <totalWorkersToCreateForEachTopic>,
+    "zookeeper.connect" : "<host1:2181,host:2181...>",
     "group.id" : "<kafkaConsumerGroupId>",
+    "bootstrap.servers" "<host1:9092,host2:9092...>",
     "backoff.increment.ms" : "<backTimeInMilli>",
     "autooffset.reset" : "<kafkaAutoOffset>",
     "topics" : ["<topic1>", "<topic2>"],
-    "eventbus.address" : "<default kafka.message>"
-  }
+    "eventbus.address" : "<default kafka.message.consumer>",
+    "consumer.poll.interval.ms" : <default 100 ms>
 }
 ```
 
@@ -45,28 +43,28 @@ For example:
 
 ```json
 {
-  "consumer" : {
-    "zookeeper.host" : "localhost",
-    "workers.per.topic" : 3,
+    "zookeeper.host" : "localhost:2181",
     "group.id" : "testGroup",
+    "bootstrap.servers" "localhost:9092",
     "backoff.increment.ms" : "100",
     "autooffset.reset" : "smallest",
     "topics" : ["testTopic"],
-    "eventbus.address" : "kafka.to.vertx.bridge"
-  }
+    "eventbus.address" : "kafka.to.vertx.bridge",
+    "consumer.poll.interval.ms" : 1000
 }
 ```
 Field breakdown:
 
 * `zookeeper.connect` a zookeeper connection string of form hostname1:port1,hostname2:port2,hostname3:port3/chroot/path used with your kafka clusters
-* `workers.per.topic` a thread will be spawned to consume messages up to the total number specified for each topic
 * `group.id` the kafka consumer group name that will be consuming related to
+* `bootstrap.servers` the list of initial kafka hosts to connect to
 * `backoff.increment.ms` backoff interval for contacting broker without messages in milliseconds
 * `autooffset.reset` how to reset the offset
 * `topics` the kafka topics to listen for
 * `eventbus.address` the vert.x address to publish messages onto when received form kafka
+* `consumer.poll.interval.ms` how often to try and consume messages
 
-For a deeper look at kafka configuration parameters check [this](https://kafka.apache.org/08/configuration.html) page out.
+For a deeper look at kafka configuration parameters check [this](http://kafka.apache.org/documentation.html) page out.
 
 ### Usage
 
@@ -84,8 +82,6 @@ consumerConfig.put(ConfigConstants.GROUP_ID, "testGroup");
 List<String> topics = new ArrayList<>();
 topics.add("testTopic");
 consumerConfig.put("topics", new JsonArray(topics));
-
-JsonObject config = new JsonObject().put("consumer", consumerConfig);
 
 deployKafka(config);
 
@@ -111,9 +107,14 @@ public void deployKafka(JsonObject config) {
 vertx.eventBus().consumer(MessageConsumer.EVENTBUS_DEFAULT_ADDRESS,
 	message -> {
 		   System.out.println(String.format("got message: %s", message.body()))
-			 // message handling code
+		   // message handling code
+		   KafkaEvent event = new KafkaEvent(message.body());
 	 });
 ```
+
+#### Consumer Errors
+
+You can listen on the address `kafka.producer.error` for errors from the kafka producer.
 
 ## Producer
 
@@ -123,11 +124,12 @@ Send a message to a kafka cluster on a predefined topic.
 
 ```json
 {
-  "producer" : {
-    "serializer.class": "<serializerclass>",
-    "metadata.broker.list": "<host>:<name>",
-    "producer.type" : "async"
-  }
+    "serializer.class":"<the default encoder>",
+    "key.serializer":"<the key encoder>",
+    "value.serializer":"<the value encoder>",
+    "bootstrap.servers":"<host1:9092,host2:9092>,"
+    "default_topic":"<default kafka topic to send to>,"
+    "eventbus.address":"<the event bus topic where you send messages to send to kafka>"
 }
 ```
 
@@ -136,16 +138,19 @@ For example:
 ```json
 {
   "producer" : {
-    "serializer.class": "kafka.serializer.StringEncoder",
-    "metadata.broker.list": "localhost:9092",
-    "producer.type" : "async"
+    "serializer.class":"org.apache.kafka.common.serialization.StringSerializer",
+    "bootstrap.servers":"localhost:9092",
+    "default_topic":"testTopic"
   }
 }
 ```
 
 * `serializer.class` The serializer class for messages
-* `metadata.broker.list`The socket connections for sending the actual data will be established based on the broker information returned in the metadata. The format is host1:port1,host2:port2, and the list can be a subset of brokers or a VIP pointing to a subset of brokers.
-* `producer.type` This parameter specifies whether the messages are sent asynchronously in a background thread. Valid values are (1) async for asynchronous send and (2) sync for synchronous send. By setting the producer to async we allow batching together of requests (which is great for throughput) but open the possibility of a failure of the client machine dropping unsent data.
+* `key.serializer` The serializer class for keys, defaults to the serializel.class if not set
+* `value.serializer` The serializer class for values, defaults to the serializel.class if not set
+* `bootstrap.servers` The socket connections for sending the actual data will be established based on the broker information returned in the metadata. The format is host1:port1,host2:port2, and the list can be a subset of brokers or a VIP pointing to a subset of brokers.
+* `default_topic` The default topic in kafka to send to
+* `eventbus.address` The address to listen to on the event bus, defaults to 'kafka.message.publisher'
 
 For a deeper look at kafka configuration parameters check [this](https://kafka.apache.org/08/configuration.html) page out.
 
@@ -161,9 +166,9 @@ vertx = Vertx.vertx();
 
 // sample config
 JsonObject producerConfig = new JsonObject();
-producerConfig.put("metadata.broker.list", "localhost:9092");
-producerConfig.put("serializer.class", "kafka.serializer.StringEncoder");
-producerConfig.put("topic", "testTopic");
+producerConfig.put("bootstrap.servers", "localhost:9092");
+producerConfig.put("serializer.class", "org.apache.kafka.common.serialization.StringSerializer");
+producerConfig.put("default_topic", "testTopic");
 
 JsonObject config = new JsonObject().put("producer", producerConfig);
 
@@ -186,8 +191,22 @@ public void deployKafka(JsonObject config) {
 #### Send message to kafka topic
 
 ```java
-	vertx.eventBus().send(busAddress, "your_message")
+
+KafkaPublisher publisher = new KafkaPublisher(vertx.eventBus());
+
+// send to the default topic
+publisher.send("a test message on a default topic");
+// send to a specific topic
+publisher.send("SomeSpecialTopic", "a test message on a default topic");
+// send to a specific topic with custom key
+publisher.send("SomeSpecialTopic", "aUserId", "a test message on a default topic");
+// send to a specific topic and partition
+publisher.send("SomeSpecialTopic", "", 5, "a test message on a default topic");
+
 ```
+#### Producer Errors
+
+You can listen on the address `kafka.producer.error` for errors from the kafka producer.
 
 
 ### Test setup

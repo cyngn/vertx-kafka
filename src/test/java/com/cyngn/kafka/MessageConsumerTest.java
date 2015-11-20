@@ -3,6 +3,7 @@ package com.cyngn.kafka;
 import com.cyngn.kafka.config.ConfigConstants;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Vertx;
+import io.vertx.core.eventbus.Message;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.unit.Async;
@@ -44,7 +45,7 @@ public class MessageConsumerTest {
 
     private static Vertx vertx;
 
-    @Ignore("This is an integration test comment out to actually run it")
+    //@Ignore("This is an integration test comment out to actually run it")
     @Test
     public void testMessageReceipt(TestContext testContext) {
         Async async = testContext.async();
@@ -53,20 +54,21 @@ public class MessageConsumerTest {
 
         JsonObject consumerConfig = new JsonObject();
         consumerConfig.put(ConfigConstants.GROUP_ID, "testGroup");
+        consumerConfig.put(ConfigConstants.ZK_CONNECT, "localhost:2181");
+        consumerConfig.put(ConfigConstants.BOOTSTRAP_SERVERS, "localhost:9092");
         List<String> topics = new ArrayList<>();
-        topics.add("testTopic");
+        topics.add("test");
         consumerConfig.put("topics", new JsonArray(topics));
 
-        JsonObject config = new JsonObject().put("consumer", consumerConfig);
-
         vertx.deployVerticle(MessageConsumer.class.getName(),
-            new DeploymentOptions().setConfig(config), deploy -> {
+            new DeploymentOptions().setConfig(consumerConfig), deploy -> {
                 if (deploy.failed()) {
                     logger.error("", deploy.cause());
                     testContext.fail("Could not deploy verticle");
                     async.complete();
                     vertx.close();
                 } else {
+                    // have the test run for 20 seconds to give you enough time to get a message off
                     long timerId = vertx.setTimer(20000, theTimerId ->
                     {
                         logger.info("Failed to get any messages");
@@ -77,9 +79,10 @@ public class MessageConsumerTest {
 
                     logger.info("Registering listener on event bus for kafka messages");
 
-                    vertx.eventBus().consumer(MessageConsumer.EVENTBUS_DEFAULT_ADDRESS, message -> {
+                    vertx.eventBus().consumer(MessageConsumer.EVENTBUS_DEFAULT_ADDRESS, (Message<JsonObject> message) -> {
                         assertTrue(message.body().toString().length() > 0);
                         logger.info("got message: " + message.body());
+                        KafkaEvent event = new KafkaEvent(message.body());
                         vertx.cancelTimer(timerId);
                         async.complete();
                         vertx.close();
