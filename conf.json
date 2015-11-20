@@ -11,8 +11,7 @@
     ]
   },
   "producer" : {
-    "serializer.class": "kafka.serializer.StringEncoder",
+    "serializer.class": "org.apache.kafka.common.serialization.StringSerializer",
     "metadata.broker.list": "localhost:9092",
-    "producer.type" : "async"
   }
 }
