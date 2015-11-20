@@ -33,5 +33,5 @@ public class ConfigConstants {
     public static String METADATA_BROKER_LIST = "metadata.broker.list";
     public static String SERIALIZER_CLASS = "serializer.class";
     public static String PRODUCER_TYPE = "producer.type";
-    public static String TOPIC = "topic";
+    public static String DEFAULT_TOPIC = "default.topic";
 }
