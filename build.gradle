@@ -2,7 +2,7 @@ apply plugin: 'java'
 // Uncomment below when doing official builds
 //apply from: "gradle/sona.gradle"
 
-version = '0.4.0'
+version = '0.4.1'
 group = "com.cyngn.vertx"
 archivesBaseName = "vertx-kafka"
 

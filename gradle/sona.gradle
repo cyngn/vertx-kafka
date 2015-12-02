@@ -24,7 +24,7 @@ uploadArchives {
       pom.project {
         name 'vertx-kafka'
         packaging 'jar'
-        description 'A library for using opentsdb with vert.x'
+        description 'A library for using kafka with vert.x'
         url 'https://github.com/cyngn/vertx-kafka'
 
         scm {
