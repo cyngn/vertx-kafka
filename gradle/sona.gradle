@@ -22,13 +22,13 @@ uploadArchives {
       }
 
       pom.project {
-        name 'vertx-opentsdb'
+        name 'vertx-kafka'
         packaging 'jar'
         description 'A library for using opentsdb with vert.x'
-        url 'https://github.com/cyngn/vertx-opentsdb'
+        url 'https://github.com/cyngn/vertx-kafka'
 
         scm {
-          url 'https://github.com/cyngn/vertx-opentsdb'
+          url 'https://github.com/cyngn/vertx-kafka'
         }
 
         licenses {
