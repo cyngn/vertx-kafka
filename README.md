@@ -16,7 +16,7 @@ Add a dependency to vertx-kafka:
 <dependency>
     <groupId>com.cyngn.vertx</groupId>
     <artifactId>vertx-kafka</artifactId>
-    <version>0.4.1</version>
+    <version>3.3.0-SNAPSHOT</version>
 </dependency>
 ```
 
