@@ -2,7 +2,7 @@ apply plugin: 'java'
 // Uncomment below when doing official builds
 //apply from: "gradle/sona.gradle"
 
-version = '0.4.1'
+version = '3.3.0'
 group = "com.cyngn.vertx"
 archivesBaseName = "vertx-kafka"
 
@@ -27,7 +27,7 @@ repositories {
 }
 
 dependencies {
-  compile 'io.vertx:vertx-core:3.1.0'
+  compile 'io.vertx:vertx-core:3.3.0-SNAPSHOT'
   compile 'org.slf4j:log4j-over-slf4j:1.7.12'
   compile ("org.apache.kafka:kafka-clients:0.9.0.0") {
       exclude group: 'com.sun.jdmk', module: 'jmxtools'
@@ -35,15 +35,15 @@ dependencies {
       exclude group: 'org.slf4j', module: 'slf4j-log4j12'
       exclude group: 'log4j', module: 'log4j'
   }
-  compile "io.vertx:vertx-codegen:3.1.0"
+  compile "io.vertx:vertx-codegen:3.3.0-SNAPSHOT"
   testCompile "junit:junit:4.11"
-  testCompile "io.vertx:vertx-unit:3.1.0"
+  testCompile "io.vertx:vertx-unit:3.3.0-SNAPSHOT"
   testCompile "org.mockito:mockito-core:1.9.5"
   testCompile "org.powermock:powermock-api-mockito:1.5.5"
 }
 
 task wrapper(type: Wrapper) {
-  gradleVersion = '2.9'
+  gradleVersion = '2.12'
 }
 
 task release() << {}
