@@ -20,6 +20,11 @@ Add a dependency to vertx-kafka:
 </dependency>
 ```
 
+| vertx-kafka | vert.x | kafka |
+| ------- | --------------:| --------: |
+| 3.3.0-SNAPSHOT | 3.3.0-SNAPSHOT | 0.9.0 |
+| 0.4.1   | 3.1.0 | 0.9.0 |
+
 ## Consumer
 
 Listening for messages coming from a kafka broker.
