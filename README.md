@@ -92,7 +92,7 @@ deployKafka(config);
 
 public void deployKafka(JsonObject config) {
    // use your vert.x reference to deploy the consumer verticle
-	 vertx.deployVerticle(MessageConsumer.class.getName(),
+	 vertx.deployVerticle(SimpleConsumer.class.getName(),
       new DeploymentOptions().setConfig(config),
 			deploy -> {
    		     if(deploy.failed()) {
@@ -109,7 +109,7 @@ public void deployKafka(JsonObject config) {
 
 ```java
 
-vertx.eventBus().consumer(MessageConsumer.EVENTBUS_DEFAULT_ADDRESS,
+vertx.eventBus().consumer(SimpleConsumer.EVENTBUS_DEFAULT_ADDRESS,
 	message -> {
 		   System.out.println(String.format("got message: %s", message.body()))
 		   // message handling code
